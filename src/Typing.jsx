@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 
 const TypingOverlayComponent = () => {
-  const textToType =
-    "Handles word wrapping with wordBreak: break-word, keeping the caret properly aligned across lines.";
+  const [textToType, setTextToType] =
+    useState("Handles word wrapping with wordBreak: break-word, keeping the caret properly aligned across lines.");
   const [userInput, setUserInput] = useState("");
   const [caretPosition, setCaretPosition] = useState({ top: 0, left: 0 });
   const [timer, setTimer] = useState(30); // Timer starts at 30 seconds
@@ -16,6 +16,31 @@ const TypingOverlayComponent = () => {
   const caretRef = useRef(null);
   const inputRef = useRef(null);
 
+  useEffect(() => {
+    const fetchAnimeQuote = async () => {
+      try {
+      let response = await fetch("https://kitsu.io/api/edge/anime?filter[text]=DemonSlayer&page[number]=1&page[size]=10");
+      console.log("response", response)
+      let data = await response.json();
+      console.log("data",data)
+      let nextLink = data.links.first || data.links.next || data.links.last ;
+        if (nextLink) {
+          response = await fetch(nextLink);
+          data = await response.json();
+          console.log("Next page data:", data);
+          
+          // Process the new data if needed (e.g., extract another anime quote/synopsis)
+          const nextAnime = data.data[0];
+          const nextSynopsis = nextAnime.attributes.synopsis;
+          setTextToType(prevText => prevText + "\n" + nextSynopsis); // Append synopsis to existing text
+        }
+      } catch(err) {
+        console.log("ERROR", err)
+      }
+    };
+
+    fetchAnimeQuote();
+  }, []);
   // Focus input on component load
   useEffect(() => {
     if (inputRef.current) {
