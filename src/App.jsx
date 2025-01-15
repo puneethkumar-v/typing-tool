@@ -1,13 +1,12 @@
-import './App.css'
+// import './App.css'
 import TypingOverlayComponent from './Typing'
 
 function App() {
 
   return (
-    <>
-      <h1>Typing Test</h1>
+    <div style={{width: "100vw", height: "100vh",       }}>
       <TypingOverlayComponent />
-    </>
+    </div>
   );
 }
 
