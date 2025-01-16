@@ -1,76 +1,70 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { motion } from "framer-motion";
+import animeNames from "./data";
 
 const TypingOverlayComponent = () => {
-  const [textToType, setTextToType] =
-    useState("Handles word wrapping with wordBreak: break-word, keeping the caret properly aligned across lines.");
+  const [textToType, setTextToType] = useState("Demo");
   const [userInput, setUserInput] = useState("");
   const [caretPosition, setCaretPosition] = useState({ top: 0, left: 0 });
-  const [timer, setTimer] = useState(30); // Timer starts at 30 seconds
-  const [isTypingAllowed, setIsTypingAllowed] = useState(true); // Control whether typing is allowed
-  console.log("isTypingAllowed", isTypingAllowed);
-  const [wordCount, setWordCount] = useState(0); // Track number of words typed
-  const [hasStartedTyping, setHasStartedTyping] = useState(false); // Flag to track if user has started typing
+  const [timer, setTimer] = useState(30);
+  const [isTypingAllowed, setIsTypingAllowed] = useState(true);
+  const [wordCount, setWordCount] = useState(0);
+  const [hasStartedTyping, setHasStartedTyping] = useState(false);
 
   const textRef = useRef(null);
   const caretRef = useRef(null);
   const inputRef = useRef(null);
 
-  useEffect(() => {
-    const fetchAnimeQuote = async () => {
-      try {
-      let response = await fetch("https://kitsu.io/api/edge/anime?filter[text]=DemonSlayer&page[number]=1&page[size]=10");
-      console.log("response", response)
-      let data = await response.json();
-      console.log("data",data)
-      let nextLink = data.links.first || data.links.next || data.links.last ;
-        if (nextLink) {
-          response = await fetch(nextLink);
-          data = await response.json();
-          console.log("Next page data:", data);
-          
-          // Process the new data if needed (e.g., extract another anime quote/synopsis)
-          const nextAnime = data.data[0];
-          const nextSynopsis = nextAnime.attributes.synopsis;
-          setTextToType(prevText => prevText + "\n" + nextSynopsis); // Append synopsis to existing text
-        }
-      } catch(err) {
-        console.log("ERROR", err)
-      }
-    };
+  // List of anime names for dynamic selection
 
+  // Fetch random anime quote
+  const fetchAnimeQuote = useMemo(() => async () => {
+    try {
+      // Select a random anime name
+      const randomAnime = animeNames[Math.floor(Math.random() * animeNames.length)];
+      const apiUrl = `https://kitsu.io/api/edge/anime?filter[text]=${randomAnime}&page[number]=1&page[size]=2`;
+
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+
+      const firstAnime = data.data?.[0];
+      const synopsis = firstAnime?.attributes?.synopsis || "No synopsis available.";
+
+      setTextToType(synopsis);
+    } catch (err) {
+      console.error("Error fetching anime quote:", err);
+    }
+  }, [animeNames]);
+
+  useEffect(() => {
     fetchAnimeQuote();
-  }, []);
-  // Focus input on component load
+  }, [fetchAnimeQuote]);
+
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus();
     }
   }, []);
 
-  let interval = useRef(null);
-  // Timer countdown logic
   useEffect(() => {
+    let interval = null;
     if (hasStartedTyping && timer > 0) {
-      interval.current = setInterval(() => {
+      interval = setInterval(() => {
         setTimer((prev) => prev - 1);
       }, 1000);
 
       if (timer <= 0) {
         setIsTypingAllowed(false);
-        clearInterval(interval.current);
+        clearInterval(interval);
       }
-
-      return () => clearInterval(interval.current);
     }
+    return () => clearInterval(interval);
   }, [hasStartedTyping, timer]);
 
-  // Calculate word count when typing or timer ends
   useEffect(() => {
-    setWordCount(userInput.trim().split(/\s+/).filter(Boolean).length); // Split by spaces to count words
+    setWordCount(userInput.trim().split(/\s+/).filter(Boolean).length);
   }, [userInput]);
 
-  // Update caret position based on user input
   useEffect(() => {
     updateCaretPosition();
   }, [userInput]);
@@ -79,7 +73,6 @@ const TypingOverlayComponent = () => {
     const spans = textRef.current.querySelectorAll("span");
     const currentSpan = spans[userInput.length];
 
-    // Check if input has reached the last character
     if (currentSpan) {
       const rect = currentSpan.getBoundingClientRect();
       const containerRect = textRef.current.getBoundingClientRect();
@@ -88,7 +81,6 @@ const TypingOverlayComponent = () => {
         left: rect.left - containerRect.left,
       });
     } else if (userInput.length === textToType.length) {
-      // If the entire text is typed, position caret after the last character
       const lastChar = spans[spans.length - 1];
       const rect = lastChar.getBoundingClientRect();
       const containerRect = textRef.current.getBoundingClientRect();
@@ -102,18 +94,16 @@ const TypingOverlayComponent = () => {
   const handleInputChange = (e) => {
     const input = e.target.value;
 
-    // Start the timer on the first keystroke
     if (input?.length === textToType?.length || timer <= 0) {
-      // setTimer(60);
-      clearInterval(interval.current);
       setIsTypingAllowed(false);
     }
+
     if (!hasStartedTyping) {
       setHasStartedTyping(true);
     }
 
     if (isTypingAllowed) {
-      setUserInput(input.slice(0, textToType.length)); // Limit input to match text length
+      setUserInput(input.slice(0, textToType.length));
     }
   };
 
@@ -123,13 +113,7 @@ const TypingOverlayComponent = () => {
       const isTyped = index < userInput.length;
       const color = isTyped ? (isCorrect ? "green" : "red") : "gray";
       return (
-        <span
-          key={index}
-          style={{
-            color,
-            whiteSpace: "pre",
-          }}
-        >
+        <span key={index} style={{ color, whiteSpace: "pre" }}>
           {char}
         </span>
       );
@@ -150,9 +134,8 @@ const TypingOverlayComponent = () => {
         padding: "20px",
       }}
     >
-      <h1 style={{ color: "black" }}>Typing Tool</h1>
+      <h1>Typing Tool</h1>
 
-      {/* Timer Display */}
       <div
         style={{ marginBottom: "20px", fontSize: "24px", fontWeight: "bold" }}
       >
@@ -170,45 +153,53 @@ const TypingOverlayComponent = () => {
           wordBreak: "break-word",
         }}
       >
-        {/* Dynamic Text Display */}
-        <p
-          ref={textRef}
-          style={{
-            position: "relative",
-            margin: 0,
-            whiteSpace: "pre-wrap",
-            wordBreak: "break-word",
-          }}
-        >
-          {getStyledText()}
-        </p>
+        <div
+        style={{
 
-        {/* Dynamic Caret */}
+              // maxHeight: "150px",
+              // overFlow: "hidden",
+              // overflowX: "hidden",
+              // overflowY: "hidden"
+
+        }}>
+
+          <p
+            ref={textRef}
+            style={{
+              position: "relative",
+              margin: 0,
+              whiteSpace: "pre-wrap",
+              wordBreak: "break-word",
+            }}
+          >
+            {getStyledText()}
+          </p>
+        </div>
+
         <motion.div
           ref={caretRef}
           animate={{ opacity: [0, 1] }}
           transition={{
             repeat: Infinity,
             duration: 0.8,
-            ease: "ease-in", // Apply ease-in animation
+            ease: "ease-in",
           }}
           style={{
             position: "absolute",
             top: caretPosition.top,
             left: caretPosition.left,
-            backgroundColor: "yellow", // Changed to yellow for visibility
-            width: "2px", // Increased width
+            backgroundColor: "yellow",
+            width: "2px",
             height: "1em",
           }}
         />
 
-        {/* Hidden Input to Capture Typing */}
         <input
           ref={inputRef}
           type="text"
           value={userInput}
           onChange={handleInputChange}
-          disabled={!isTypingAllowed} // Disable input after 30 seconds
+          disabled={!isTypingAllowed}
           style={{
             position: "absolute",
             top: 0,
@@ -221,7 +212,6 @@ const TypingOverlayComponent = () => {
         />
       </div>
 
-      {/* Display the number of words typed */}
       {!isTypingAllowed && (
         <div style={{ marginTop: "20px", fontSize: "18px" }}>
           You typed {wordCount} word{wordCount !== 1 && "s"} in 30 seconds!
