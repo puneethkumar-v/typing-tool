@@ -34,7 +34,7 @@ const TypingOverlayComponent = () => {
     } catch (err) {
       console.error("Error fetching anime quote:", err);
     }
-  }, [animeNames]);
+  }, []);
 
   useEffect(() => {
     fetchAnimeQuote();
@@ -151,30 +151,22 @@ const TypingOverlayComponent = () => {
           lineHeight: "1.5",
           textAlign: "left",
           wordBreak: "break-word",
+          maxHeight: "150px",
+          overflowY: "scroll",
+          overflowX: "hidden",
         }}
       >
-        <div
-        style={{
-
-              // maxHeight: "150px",
-              // overFlow: "hidden",
-              // overflowX: "hidden",
-              // overflowY: "hidden"
-
-        }}>
-
-          <p
-            ref={textRef}
-            style={{
-              position: "relative",
-              margin: 0,
-              whiteSpace: "pre-wrap",
-              wordBreak: "break-word",
-            }}
-          >
-            {getStyledText()}
-          </p>
-        </div>
+        <p
+          ref={textRef}
+          style={{
+            position: "relative",
+            margin: 0,
+            whiteSpace: "pre-wrap",
+            wordBreak: "break-word",
+          }}
+        >
+          {getStyledText()}
+        </p>
 
         <motion.div
           ref={caretRef}
