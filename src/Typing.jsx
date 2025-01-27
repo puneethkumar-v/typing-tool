@@ -18,23 +18,28 @@ const TypingOverlayComponent = () => {
   // List of anime names for dynamic selection
 
   // Fetch random anime quote
-  const fetchAnimeQuote = useMemo(() => async () => {
-    try {
-      // Select a random anime name
-      const randomAnime = animeNames[Math.floor(Math.random() * animeNames.length)];
-      const apiUrl = `https://kitsu.io/api/edge/anime?filter[text]=${randomAnime}&page[number]=1&page[size]=2`;
+  const fetchAnimeQuote = useMemo(
+    () => async () => {
+      try {
+        // Select a random anime name
+        const randomAnime =
+          animeNames[Math.floor(Math.random() * animeNames.length)];
+        const apiUrl = `https://kitsu.io/api/edge/anime?filter[text]=${randomAnime}&page[number]=1&page[size]=2`;
 
-      const response = await fetch(apiUrl);
-      const data = await response.json();
+        const response = await fetch(apiUrl);
+        const data = await response.json();
 
-      const firstAnime = data.data?.[0];
-      const synopsis = firstAnime?.attributes?.synopsis || "No synopsis available.";
+        const firstAnime = data.data?.[0];
+        const synopsis =
+          firstAnime?.attributes?.synopsis || "No synopsis available.";
 
-      setTextToType(synopsis);
-    } catch (err) {
-      console.error("Error fetching anime quote:", err);
-    }
-  }, []);
+        setTextToType(synopsis);
+      } catch (err) {
+        console.error("Error fetching anime quote:", err);
+      }
+    },
+    []
+  );
 
   useEffect(() => {
     fetchAnimeQuote();
@@ -90,6 +95,13 @@ const TypingOverlayComponent = () => {
       });
     }
   };
+
+  useEffect(() => {
+    caretRef?.current.scrollIntoView({
+      behavior: "instant",
+      block: "center",
+    });
+  }, [caretPosition]);
 
   const handleInputChange = (e) => {
     const input = e.target.value;
