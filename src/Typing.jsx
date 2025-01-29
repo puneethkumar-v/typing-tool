@@ -61,7 +61,7 @@ export default function TypingOverlayComponent() {
   // Autoscroll to set typable character in the middle
   useEffect(() => {
     autoScrollFocusRef.current?.scrollIntoView({
-      behavior: "instant",
+      behavior: "smooth",
       block: "center",
     });
   }, [typable]);
@@ -274,11 +274,9 @@ export default function TypingOverlayComponent() {
           paddingInline: TYPABLE_PARENT_X_PADDING, // X-axis padding (left and right)
           textAlign: "left",
           wordBreak: "break-word",
-          maxHeight: "150px",
+          maxHeight: "140px",
           overflowY: "scroll",
-          overflowX: "hidden",
-          border: "2px solid black",
-          borderRadius: "10px 0px 0px 10px",
+          overflow: "hidden",
         }}
       >
         <div
