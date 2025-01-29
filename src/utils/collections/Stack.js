@@ -1,38 +1,35 @@
-export default class Stack {
-    constructor() {
-      this.items = [];
-    }
+const Stack = () => {
+  let items = [];
+
+  const isEmpty = () => items.length === 0;
   
-    isEmpty() {
-      return this.size() == 0;
-    }
+  const size = () => items.length;
   
-    size() {
-      return this.items.length;
-    }
+  const clear = () => {
+    items = [];
+  };
   
-    clear() {
-      this.items = [];
-    }
+  const push = (item) => {
+    items.push(item);
+  };
   
-    push(item) {
-      this.items.push(item);
-    }
+  const pop = () => {
+    if (isEmpty()) throw new Error("Stack is Empty!");
+    return items.pop();
+  };
   
-    pop() {
-      if (this.isEmpty()) throw new Error("Stack is Empty!");
-      return this.items.pop();
-    }
+  const peek = () => {
+    if (isEmpty()) throw new Error("Stack is Empty!");
+    return items[items.length - 1];
+  };
   
-    peek() {
-      if (this.isEmpty()) throw new Error("Stack is Empty!");
-      return this.items[this.items.length - 1];
-    }
-    print() {
-      for (let i = this.items.length - 1; i >= 0; i--) console.log(this.items[i]);
-    }
+  const print = () => {
+    for (let i = items.length - 1; i >= 0; i--) console.log(items[i]);
+  };
   
-    getStack() {
-      return this.items;
-    }
-  }
+  const getStack = () => items;
+
+  return { isEmpty, size, clear, push, pop, peek, print, getStack };
+};
+
+export default Stack;

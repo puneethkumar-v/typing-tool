@@ -6,12 +6,12 @@ import SpanComponent from "./components/SpanComponent";
 import { motion } from "framer-motion";
 
 export default function TypingOverlayComponent() {
-  const FIXED_TIME = Number(import.meta.env.VITE_TEST_DURATION_IN_SECONDS);
+  const FIXED_TIME = Number(import.meta.env.VITE_TEST_DURATION_IN_SECONDS) || 30;
   const TYPABLE_PARENT_Y_PADDING = 10;
   const TYPABLE_PARENT_X_PADDING = 20;
 
-  const unTypedRef = useRef(new Stack());
-  const typedRef = useRef(new Stack());
+  const unTypedRef = useRef(Stack());
+  const typedRef = useRef(Stack());
   const inputRef = useRef(null);
   const autoScrollFocusRef = useRef(null);
   const interval = useRef(null);
@@ -37,7 +37,7 @@ export default function TypingOverlayComponent() {
         setTimer((prev) => prev - 1);
       }, 1000);
 
-      if (unTypedRef.current.size() == 0 || timer <= 0) {
+      if (unTypedRef.current.isEmpty() || timer <= 0) {
         clearInterval(interval.current);
       }
     }
@@ -144,7 +144,7 @@ export default function TypingOverlayComponent() {
 
   const checkTyped = useCallback((typedChar) => {
     // Returns if there is nothing to type
-    if (unTypedRef.current.size() == 0) {
+    if (unTypedRef.current.isEmpty()) {
       return;
     }
     const unTypedCharSpan = unTypedRef.current.pop();
@@ -200,7 +200,7 @@ export default function TypingOverlayComponent() {
       const typedChar = inputText[inputText.length - 1];
       checkTyped(typedChar);
     }
-    if (!(unTypedRef.current.size() == 0 || timer <= 0)) {
+    if (!(unTypedRef.current.isEmpty() || timer <= 0)) {
       setUserInput( inputText.slice(0, unTypedRef.current.size() + typedRef.current.size()) );
     }
   };
@@ -295,7 +295,7 @@ export default function TypingOverlayComponent() {
             <SpanComponent key={0} color={ETextColor.UNTYPED} char="Loading text..."/>
           )}
         </div>
-        {!(unTypedRef.current.size() == 0 || timer <= 0) && (
+        {!(unTypedRef.current.isEmpty() || timer <= 0) && (
           <motion.div
             animate={{ opacity: [0, 1] }}
             transition={{
@@ -319,7 +319,7 @@ export default function TypingOverlayComponent() {
         ref={inputRef}
         type="text"
         onChange={handleInputChange}
-        disabled={unTypedRef.current.size() == 0 || timer <= 0}
+        disabled={unTypedRef.current.isEmpty() || timer <= 0}
         style={{
           position: "absolute",
           top: 0,
@@ -331,7 +331,7 @@ export default function TypingOverlayComponent() {
         }}
       />
 
-      {(unTypedRef.current.size() == 0 || timer <= 0) && (
+      {(unTypedRef.current.isEmpty() || timer <= 0) && (
         <div style={{ marginTop: "20px", fontSize: "18px" }}>
           You typed {wordCount} word{wordCount !== 1 && "s"} in {elapsedTime} seconds!
         </div>
