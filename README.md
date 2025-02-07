@@ -1,8 +1,22 @@
-# React + Vite
+# Typing Test tool
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## TODO:
 
-Currently, two official plugins are available:
+- [*] Setup react vite project
+- [*] Clean up fresh project
+- [*] main page:
+    - [*] typing spcae
+    - [*] Dummy typing words
+        - [*] Any Public API's paragraph extraction
+            - [*] Anime storyline API paragrah text
+    - [*] [monkeytyping](monkeytype.com) reference desing
+    - [*] Auto scrollable paragraph text
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- [ ] Integrating Tailwindcss and Desi UI
+- [ ] Implementing Optional Themes explorer for users through desi UI
+- [ ] Proper Insights for user
+    - [ ] Exact WPM
+    - [ ] Errors count
+    - [ ] Graph showcase
+    - [ ] Replay typed session
+
